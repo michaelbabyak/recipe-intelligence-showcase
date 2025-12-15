@@ -162,10 +162,7 @@ export default function DataExplorerPage() {
                       tick={{ fill: 'var(--foreground-muted)', fontSize: 12 }}
                     />
                     <Tooltip
-                      formatter={(value: number, name: string, props: { payload: { percentage: number } }) => [
-                        `${value.toLocaleString()} recipes (${props.payload.percentage}%)`,
-                        ''
-                      ]}
+                      formatter={(value) => [`${Number(value).toLocaleString()} recipes`, '']}
                       contentStyle={{ borderRadius: '12px', border: '1px solid var(--border-light)' }}
                     />
                     <Bar dataKey="recipes" fill={COLORS.terracotta} radius={[0, 4, 4, 0]}>
@@ -197,10 +194,7 @@ export default function DataExplorerPage() {
                     />
                     <YAxis tickLine={false} axisLine={false} tickFormatter={(v) => (v / 1000) + 'K'} />
                     <Tooltip
-                      formatter={(value: number, name: string, props: { payload: { percentage: number } }) => [
-                        `${value.toLocaleString()} recipes (${props.payload.percentage}%)`,
-                        ''
-                      ]}
+                      formatter={(value) => [`${Number(value).toLocaleString()} recipes`, '']}
                       contentStyle={{ borderRadius: '12px', border: '1px solid var(--border-light)' }}
                     />
                     <Bar dataKey="recipes" fill={COLORS.charcoal} radius={[4, 4, 0, 0]}>
@@ -247,10 +241,7 @@ export default function DataExplorerPage() {
                   />
                   <YAxis tickLine={false} axisLine={false} tickFormatter={(v) => (v / 1000) + 'K'} />
                   <Tooltip
-                    formatter={(value: number, name: string, props: { payload: { role: string; avgQty: number } }) => [
-                      `${value.toLocaleString()} recipes | Avg qty: ${props.payload.avgQty}`,
-                      props.payload.role
-                    ]}
+                    formatter={(value) => [`${Number(value).toLocaleString()} recipes`, '']}
                     contentStyle={{ borderRadius: '12px', border: '1px solid var(--border-light)' }}
                   />
                   <Bar dataKey="recipes" radius={[4, 4, 0, 0]}>
@@ -310,10 +301,7 @@ export default function DataExplorerPage() {
                       ))}
                     </Pie>
                     <Tooltip
-                      formatter={(value: number, name: string, props: { payload: { percentage: number } }) => [
-                        `${value.toLocaleString()} recipes (${props.payload.percentage}%)`,
-                        ''
-                      ]}
+                      formatter={(value) => [`${Number(value).toLocaleString()} recipes`, '']}
                       contentStyle={{ borderRadius: '12px', border: '1px solid var(--border-light)' }}
                     />
                     <Legend verticalAlign="bottom" height={36} />
@@ -339,10 +327,7 @@ export default function DataExplorerPage() {
                       tick={{ fill: 'var(--foreground-muted)', fontSize: 12 }}
                     />
                     <Tooltip
-                      formatter={(value: number, name: string, props: { payload: { percentage: number } }) => [
-                        `${value.toLocaleString()} events (${props.payload.percentage}%)`,
-                        ''
-                      ]}
+                      formatter={(value) => [`${Number(value).toLocaleString()} events`, '']}
                       contentStyle={{ borderRadius: '12px', border: '1px solid var(--border-light)' }}
                     />
                     <Bar dataKey="events" fill={COLORS.success} radius={[0, 4, 4, 0]} />
@@ -435,10 +420,7 @@ export default function DataExplorerPage() {
                     <XAxis dataKey="range" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
                     <YAxis tickLine={false} axisLine={false} tickFormatter={(v) => (v / 1000) + 'K'} />
                     <Tooltip
-                      formatter={(value: number, name: string, props: { payload: { percentage: number } }) => [
-                        `${value.toLocaleString()} recipes (${props.payload.percentage}%)`,
-                        ''
-                      ]}
+                      formatter={(value) => [`${Number(value).toLocaleString()} recipes`, '']}
                       contentStyle={{ borderRadius: '12px', border: '1px solid var(--border-light)' }}
                     />
                     <Bar dataKey="count" fill={COLORS.charcoal} radius={[4, 4, 0, 0]} />
@@ -568,10 +550,7 @@ export default function DataExplorerPage() {
                     <XAxis dataKey="range" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
                     <YAxis tickLine={false} axisLine={false} />
                     <Tooltip
-                      formatter={(value: number, name: string, props: { payload: { percentage: number; avg: number } }) => [
-                        `${value} stems (${props.payload.percentage}%) | Avg: $${props.payload.avg.toFixed(2)}`,
-                        ''
-                      ]}
+                      formatter={(value) => [`${Number(value)} stems`, '']}
                       contentStyle={{ borderRadius: '12px', border: '1px solid var(--border-light)' }}
                     />
                     <Bar dataKey="count" fill={COLORS.terracotta} radius={[4, 4, 0, 0]}>
