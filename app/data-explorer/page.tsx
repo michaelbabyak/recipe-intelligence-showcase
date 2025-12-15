@@ -2,16 +2,14 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
-  ArrowLeft, Filter, RefreshCw, Camera, Database, Palette,
-  Flower2, MapPin, Calendar, TrendingUp, ChevronDown, X,
-  Loader2, AlertCircle, ExternalLink
+  ArrowLeft, Camera, Database, Palette, Flower2, MapPin, Calendar,
+  TrendingUp, DollarSign, BarChart3, Layers, Package, Users
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
-  PieChart, Pie, Legend
+  PieChart, Pie, Legend, LineChart, Line, AreaChart, Area
 } from "recharts";
 import recipeStats from "@/data/recipe-stats.json";
 
@@ -26,84 +24,38 @@ const staggerContainer = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: 0.08,
       delayChildren: 0.1
     }
   }
 };
 
-// API URL
-const MEDIA_SERVICE_URL = process.env.NEXT_PUBLIC_MEDIA_SERVICE_URL || 'https://media-service-952282550478.us-central1.run.app';
+// Color helpers
+const COLORS = {
+  terracotta: '#E17055',
+  terracottaLight: '#FAB1A0',
+  charcoal: '#2D3436',
+  charcoalLight: '#636E72',
+  success: '#00B894',
+  warning: '#FDCB6E',
+};
 
-// Types
-interface FacetData {
-  color_palettes: { name: string; count: number }[];
-  arrangement_types: { name: string; count: number }[];
-  states: { name: string; count: number }[];
-  flowers: { name: string; count: number }[];
-  seasons: { name: string; count: number }[];
-  total_images: number;
-}
+const ROLE_COLORS: Record<string, string> = {
+  FOCAL: COLORS.terracotta,
+  SECONDARY: COLORS.terracottaLight,
+  LINEAR: '#74B9FF',
+  GREENERY: COLORS.success,
+  FILLER: COLORS.warning,
+};
 
-// Custom hook for fetching facets
-function useFacets() {
-  const [data, setData] = useState<FacetData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  const fetchFacets = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`${MEDIA_SERVICE_URL}/api/v1/images/facets`);
-      if (!response.ok) throw new Error('Failed to fetch facets');
-      const json = await response.json();
-      setData(json);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Unknown error'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchFacets();
-  }, []);
-
-  return { data, isLoading, error, refetch: fetchFacets };
-}
+const SEASON_COLORS: Record<string, string> = {
+  Spring: '#7ED6A5',
+  Summer: '#FDCB6E',
+  Fall: '#E17055',
+  Winter: '#74B9FF',
+};
 
 export default function DataExplorerPage() {
-  const { data: facets, isLoading, error, refetch } = useFacets();
-  const [selectedPalette, setSelectedPalette] = useState<string | null>(null);
-  const [selectedArrangement, setSelectedArrangement] = useState<string | null>(null);
-
-  // Prepare chart data
-  const colorChartData = facets?.color_palettes?.slice(0, 10).map(p => ({
-    name: p.name,
-    count: p.count
-  })) || [];
-
-  const arrangementChartData = facets?.arrangement_types?.slice(0, 8).map(a => ({
-    name: formatArrangementType(a.name),
-    count: a.count
-  })) || [];
-
-  const stateChartData = facets?.states?.slice(0, 10).map(s => ({
-    name: s.name,
-    count: s.count
-  })) || [];
-
-  const seasonChartData = facets?.seasons?.map(s => ({
-    name: s.name,
-    count: s.count
-  })) || [];
-
-  const flowerChartData = facets?.flowers?.slice(0, 12).map(f => ({
-    name: f.name,
-    count: f.count
-  })) || [];
-
   return (
     <main className="min-h-screen">
       {/* Header */}
@@ -144,321 +96,127 @@ export default function DataExplorerPage() {
               <Link href="/future-vision" className="text-[var(--foreground-muted)] hover:text-[var(--terracotta)] transition-colors">
                 <ArrowLeft className="w-5 h-5" />
               </Link>
-              <span className="badge badge-accent">Live Data</span>
+              <span className="badge badge-accent">Dashboard</span>
             </motion.div>
 
             <motion.h1 variants={fadeInUp} className="text-hero mb-6">
               Data Explorer
             </motion.h1>
 
-            <motion.p variants={fadeInUp} className="text-xl text-[var(--foreground-muted)] max-w-3xl mb-6">
-              Explore live data from our indexed image catalog. See the real distribution of colors,
-              arrangements, and locations across {facets?.total_images?.toLocaleString() || '...'} images.
+            <motion.p variants={fadeInUp} className="text-xl text-[var(--foreground-muted)] max-w-3xl">
+              A comprehensive view of Poppy&apos;s recipe data. Explore distributions across
+              color palettes, arrangement types, stems, geography, and more.
             </motion.p>
-
-            {/* Data source indicator */}
-            <motion.div variants={fadeInUp} className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-sm text-[var(--foreground-muted)]">
-                <Database className="w-4 h-4" />
-                <span>Media Service API</span>
-                {isLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin text-[var(--terracotta)]" />
-                ) : error ? (
-                  <span className="text-[var(--error)]">Error</span>
-                ) : (
-                  <span className="text-[var(--success)]">Connected</span>
-                )}
-              </div>
-              <button
-                onClick={refetch}
-                className="flex items-center gap-1 text-sm text-[var(--terracotta)] hover:underline"
-              >
-                <RefreshCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
-                Refresh
-              </button>
-            </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* Stats Row */}
+      {/* Key Metrics Row */}
       <section className="pb-12">
         <div className="container">
           <motion.div
             initial="hidden"
             animate="visible"
             variants={staggerContainer}
-            className="grid grid-cols-2 md:grid-cols-5 gap-4"
+            className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4"
           >
-            <StatCard
-              icon={<Camera className="w-5 h-5" />}
-              value={facets?.total_images?.toLocaleString() || '...'}
-              label="Total Images"
-              loading={isLoading}
-            />
-            <StatCard
-              icon={<Palette className="w-5 h-5" />}
-              value={facets?.color_palettes?.length?.toString() || '...'}
-              label="Color Palettes"
-              loading={isLoading}
-            />
-            <StatCard
-              icon={<Flower2 className="w-5 h-5" />}
-              value={facets?.arrangement_types?.length?.toString() || '...'}
-              label="Arrangement Types"
-              loading={isLoading}
-            />
-            <StatCard
-              icon={<MapPin className="w-5 h-5" />}
-              value={facets?.states?.length?.toString() || '...'}
-              label="States"
-              loading={isLoading}
-            />
-            <StatCard
-              icon={<Calendar className="w-5 h-5" />}
-              value={facets?.seasons?.length?.toString() || '4'}
-              label="Seasons"
-              loading={isLoading}
-            />
+            <MetricCard icon={<Package />} value={recipeStats.totals.recipes.toLocaleString()} label="Recipes" />
+            <MetricCard icon={<Layers />} value={recipeStats.totals.templates.toLocaleString()} label="Templates" />
+            <MetricCard icon={<Flower2 />} value={recipeStats.totals.stems.toLocaleString()} label="Stems" />
+            <MetricCard icon={<Calendar />} value={recipeStats.totals.events.toLocaleString()} label="Events" />
+            <MetricCard icon={<Camera />} value={(recipeStats.totals.designerPhotos / 1000).toFixed(0) + "K"} label="Photos" />
+            <MetricCard icon={<Palette />} value={recipeStats.totals.stemPalettes.toString()} label="Palettes" />
+            <MetricCard icon={<Database />} value={recipeStats.totals.formulas.toString()} label="Formulas" />
+            <MetricCard icon={<Users />} value={recipeStats.totals.suppliers.toString()} label="Suppliers" />
           </motion.div>
         </div>
       </section>
 
-      {/* Error State */}
-      {error && (
-        <section className="pb-12">
-          <div className="container">
-            <div className="card bg-[var(--error)]/10 border border-[var(--error)]/20 text-center py-12">
-              <AlertCircle className="w-12 h-12 mx-auto mb-4 text-[var(--error)]" />
-              <h3 className="text-heading mb-2">Unable to Load Live Data</h3>
-              <p className="text-[var(--foreground-muted)] mb-4">
-                The media service API is currently unavailable. Showing static data instead.
-              </p>
-              <button onClick={refetch} className="btn btn-primary">
-                <RefreshCw className="w-4 h-4" />
-                Try Again
-              </button>
-            </div>
-          </div>
-        </section>
-      )}
+      {/* Color Palettes & Arrangements */}
+      <section className="section bg-[var(--background-warm)]">
+        <div className="container">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            <motion.h2 variants={fadeInUp} className="text-title mb-8">Recipe Distribution</motion.h2>
 
-      {/* Charts Section */}
-      {!error && (
-        <>
-          {/* Color Palettes & Arrangements Row */}
-          <section className="section bg-[var(--background-warm)]">
-            <div className="container">
-              <div className="grid lg:grid-cols-2 gap-8">
-                {/* Color Palettes Chart */}
-                <ChartCard
-                  title="Images by Color Palette"
-                  subtitle="Top 10 color palettes in the catalog"
-                  icon={<Palette className="w-5 h-5" />}
-                  loading={isLoading}
-                >
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={colorChartData} layout="vertical">
-                      <XAxis type="number" tickLine={false} axisLine={false} />
-                      <YAxis
-                        type="category"
-                        dataKey="name"
-                        width={100}
-                        tickLine={false}
-                        axisLine={false}
-                        tick={{ fill: 'var(--foreground-muted)', fontSize: 12 }}
-                      />
-                      <Tooltip
-                        formatter={(value: number) => [value.toLocaleString() + ' images', '']}
-                        contentStyle={{
-                          borderRadius: '12px',
-                          border: '1px solid var(--border-light)',
-                          boxShadow: 'var(--shadow-md)'
-                        }}
-                      />
-                      <Bar dataKey="count" fill="var(--terracotta)" radius={[0, 4, 4, 0]}>
-                        {colorChartData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={index === 0 ? 'var(--terracotta)' : 'var(--terracotta-light)'}
-                            cursor="pointer"
-                            onClick={() => setSelectedPalette(entry.name === selectedPalette ? null : entry.name)}
-                          />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-
-                {/* Arrangement Types Chart */}
-                <ChartCard
-                  title="Images by Arrangement Type"
-                  subtitle="Distribution of arrangement categories"
-                  icon={<Flower2 className="w-5 h-5" />}
-                  loading={isLoading}
-                >
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={arrangementChartData}>
-                      <XAxis
-                        dataKey="name"
-                        tickLine={false}
-                        axisLine={false}
-                        tick={{ fill: 'var(--foreground-muted)', fontSize: 10 }}
-                        interval={0}
-                        angle={-45}
-                        textAnchor="end"
-                        height={80}
-                      />
-                      <YAxis tickLine={false} axisLine={false} tick={{ fill: 'var(--foreground-muted)', fontSize: 12 }} />
-                      <Tooltip
-                        formatter={(value: number) => [value.toLocaleString() + ' images', '']}
-                        contentStyle={{
-                          borderRadius: '12px',
-                          border: '1px solid var(--border-light)',
-                          boxShadow: 'var(--shadow-md)'
-                        }}
-                      />
-                      <Bar dataKey="count" fill="var(--charcoal)" radius={[4, 4, 0, 0]}>
-                        {arrangementChartData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={index === 0 ? 'var(--charcoal)' : 'var(--charcoal-light)'}
-                          />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-              </div>
-            </div>
-          </section>
-
-          {/* Geographic & Seasonal Row */}
-          <section className="section">
-            <div className="container">
-              <div className="grid lg:grid-cols-2 gap-8">
-                {/* States Chart */}
-                <ChartCard
-                  title="Images by State"
-                  subtitle="Geographic distribution of wedding photos"
-                  icon={<MapPin className="w-5 h-5" />}
-                  loading={isLoading}
-                >
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={stateChartData} layout="vertical">
-                      <XAxis type="number" tickLine={false} axisLine={false} />
-                      <YAxis
-                        type="category"
-                        dataKey="name"
-                        width={120}
-                        tickLine={false}
-                        axisLine={false}
-                        tick={{ fill: 'var(--foreground-muted)', fontSize: 12 }}
-                      />
-                      <Tooltip
-                        formatter={(value: number) => [value.toLocaleString() + ' images', '']}
-                        contentStyle={{
-                          borderRadius: '12px',
-                          border: '1px solid var(--border-light)',
-                          boxShadow: 'var(--shadow-md)'
-                        }}
-                      />
-                      <Bar dataKey="count" fill="var(--success)" radius={[0, 4, 4, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-
-                {/* Seasons Chart */}
-                <ChartCard
-                  title="Images by Season"
-                  subtitle="Seasonal distribution of the catalog"
-                  icon={<Calendar className="w-5 h-5" />}
-                  loading={isLoading}
-                >
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={seasonChartData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={100}
-                        paddingAngle={2}
-                        dataKey="count"
-                        nameKey="name"
-                      >
-                        {seasonChartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={getSeasonColor(entry.name)} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        formatter={(value: number) => [value.toLocaleString() + ' images', '']}
-                        contentStyle={{
-                          borderRadius: '12px',
-                          border: '1px solid var(--border-light)',
-                          boxShadow: 'var(--shadow-md)'
-                        }}
-                      />
-                      <Legend
-                        verticalAlign="bottom"
-                        height={36}
-                        formatter={(value) => <span style={{ color: 'var(--foreground-muted)', fontSize: '13px' }}>{value}</span>}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-              </div>
-            </div>
-          </section>
-
-          {/* Top Flowers */}
-          <section className="section bg-[var(--background-warm)]">
-            <div className="container">
+            <div className="grid lg:grid-cols-2 gap-8">
+              {/* Color Palettes */}
               <ChartCard
-                title="Most Common Flowers"
-                subtitle="Top 12 flowers identified in the catalog"
-                icon={<Flower2 className="w-5 h-5" />}
-                loading={isLoading}
-                wide
+                title="Recipes by Color Palette"
+                subtitle="16 curated palettes across all recipes"
+                icon={<Palette className="w-5 h-5" />}
               >
-                <ResponsiveContainer width="100%" height={350}>
-                  <BarChart data={flowerChartData}>
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart data={recipeStats.colorPaletteDistribution.slice(0, 10)} layout="vertical">
+                    <XAxis type="number" tickLine={false} axisLine={false} tickFormatter={(v) => v.toLocaleString()} />
+                    <YAxis
+                      type="category"
+                      dataKey="name"
+                      width={110}
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{ fill: 'var(--foreground-muted)', fontSize: 12 }}
+                    />
+                    <Tooltip
+                      formatter={(value: number, name: string, props: { payload: { percentage: number } }) => [
+                        `${value.toLocaleString()} recipes (${props.payload.percentage}%)`,
+                        ''
+                      ]}
+                      contentStyle={{ borderRadius: '12px', border: '1px solid var(--border-light)' }}
+                    />
+                    <Bar dataKey="recipes" fill={COLORS.terracotta} radius={[0, 4, 4, 0]}>
+                      {recipeStats.colorPaletteDistribution.slice(0, 10).map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={index === 0 ? COLORS.terracotta : COLORS.terracottaLight} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartCard>
+
+              {/* Arrangement Types */}
+              <ChartCard
+                title="Recipes by Arrangement Type"
+                subtitle="Distribution across product categories"
+                icon={<Flower2 className="w-5 h-5" />}
+              >
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart data={recipeStats.arrangementTypeDistribution}>
                     <XAxis
                       dataKey="name"
                       tickLine={false}
                       axisLine={false}
-                      tick={{ fill: 'var(--foreground-muted)', fontSize: 11 }}
+                      tick={{ fill: 'var(--foreground-muted)', fontSize: 10 }}
                       interval={0}
                       angle={-45}
                       textAnchor="end"
                       height={100}
                     />
-                    <YAxis tickLine={false} axisLine={false} tick={{ fill: 'var(--foreground-muted)', fontSize: 12 }} />
+                    <YAxis tickLine={false} axisLine={false} tickFormatter={(v) => (v / 1000) + 'K'} />
                     <Tooltip
-                      formatter={(value: number) => [value.toLocaleString() + ' appearances', '']}
-                      contentStyle={{
-                        borderRadius: '12px',
-                        border: '1px solid var(--border-light)',
-                        boxShadow: 'var(--shadow-md)'
-                      }}
+                      formatter={(value: number, name: string, props: { payload: { percentage: number } }) => [
+                        `${value.toLocaleString()} recipes (${props.payload.percentage}%)`,
+                        ''
+                      ]}
+                      contentStyle={{ borderRadius: '12px', border: '1px solid var(--border-light)' }}
                     />
-                    <Bar dataKey="count" fill="var(--terracotta)" radius={[4, 4, 0, 0]}>
-                      {flowerChartData.map((_, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={`rgba(225, 112, 85, ${1 - index * 0.07})`}
-                        />
+                    <Bar dataKey="recipes" fill={COLORS.charcoal} radius={[4, 4, 0, 0]}>
+                      {recipeStats.arrangementTypeDistribution.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={index < 3 ? COLORS.charcoal : COLORS.charcoalLight} />
                       ))}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </ChartCard>
             </div>
-          </section>
-        </>
-      )}
+          </motion.div>
+        </div>
+      </section>
 
-      {/* Static Data Section */}
+      {/* Top Stems */}
       <section className="section">
         <div className="container">
           <motion.div
@@ -467,49 +225,403 @@ export default function DataExplorerPage() {
             viewport={{ once: true }}
             variants={staggerContainer}
           >
-            <motion.div variants={fadeInUp} className="text-center mb-12">
-              <span className="badge mb-4">Recipe Database</span>
-              <h2 className="text-title mb-4">Recipe Statistics</h2>
-              <p className="text-[var(--foreground-muted)] max-w-2xl mx-auto">
-                Summary statistics from our recipe database - the foundation for visual-first proposals.
-              </p>
-            </motion.div>
+            <motion.h2 variants={fadeInUp} className="text-title mb-8">Most Used Stems</motion.h2>
 
-            <motion.div variants={fadeInUp} className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <RecipeStatCard
-                value={recipeStats.totals.recipes.toLocaleString()}
-                label="Total Recipes"
-                sublabel="Event-specific production specs"
-              />
-              <RecipeStatCard
-                value={recipeStats.totals.templates.toLocaleString()}
-                label="Templates"
-                sublabel="Catalog inspiration items"
-              />
-              <RecipeStatCard
-                value={recipeStats.totals.stems.toLocaleString()}
-                label="Unique Stems"
-                sublabel="Flowers, greenery, filler"
-              />
-              <RecipeStatCard
-                value={recipeStats.totals.formulas.toString()}
-                label="Formulas"
-                sublabel="Role-based composition rules"
-              />
-            </motion.div>
+            <ChartCard
+              title="Top 12 Stems by Recipe Count"
+              subtitle="Color-coded by stem role"
+              icon={<Flower2 className="w-5 h-5" />}
+              wide
+            >
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart data={recipeStats.topStems}>
+                  <XAxis
+                    dataKey="name"
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fill: 'var(--foreground-muted)', fontSize: 10 }}
+                    interval={0}
+                    angle={-45}
+                    textAnchor="end"
+                    height={120}
+                  />
+                  <YAxis tickLine={false} axisLine={false} tickFormatter={(v) => (v / 1000) + 'K'} />
+                  <Tooltip
+                    formatter={(value: number, name: string, props: { payload: { role: string; avgQty: number } }) => [
+                      `${value.toLocaleString()} recipes | Avg qty: ${props.payload.avgQty}`,
+                      props.payload.role
+                    ]}
+                    contentStyle={{ borderRadius: '12px', border: '1px solid var(--border-light)' }}
+                  />
+                  <Bar dataKey="recipes" radius={[4, 4, 0, 0]}>
+                    {recipeStats.topStems.map((stem, index) => (
+                      <Cell key={`cell-${index}`} fill={ROLE_COLORS[stem.role] || COLORS.charcoal} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
 
-            {/* Match rates */}
-            <motion.div variants={fadeInUp} className="grid md:grid-cols-4 gap-4 mt-8">
-              <MatchRateCard value={recipeStats.matchRates.exact} label="Exact Match" color="var(--success)" />
-              <MatchRateCard value={recipeStats.matchRates.containsAll} label="Contains All" color="#7ED6A5" />
-              <MatchRateCard value={recipeStats.matchRates.hasOverlap} label="Has Overlap" color="var(--terracotta-light)" />
-              <MatchRateCard value={recipeStats.matchRates.zeroOverlap} label="Zero Overlap" color="var(--charcoal)" />
-            </motion.div>
+              {/* Legend */}
+              <div className="flex flex-wrap justify-center gap-6 mt-6 pt-6 border-t border-[var(--border-light)]">
+                {Object.entries(ROLE_COLORS).map(([role, color]) => (
+                  <div key={role} className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded" style={{ backgroundColor: color }} />
+                    <span className="text-sm text-[var(--foreground-muted)]">{role}</span>
+                  </div>
+                ))}
+              </div>
+            </ChartCard>
           </motion.div>
         </div>
       </section>
 
-      {/* API Documentation */}
+      {/* Season & Geography */}
+      <section className="section bg-[var(--background-warm)]">
+        <div className="container">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            <motion.h2 variants={fadeInUp} className="text-title mb-8">Seasonal & Geographic</motion.h2>
+
+            <div className="grid lg:grid-cols-2 gap-8">
+              {/* Seasons */}
+              <ChartCard
+                title="Recipes by Season"
+                subtitle="Wedding seasonality patterns"
+                icon={<Calendar className="w-5 h-5" />}
+              >
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={recipeStats.seasonDistribution}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={70}
+                      outerRadius={110}
+                      paddingAngle={2}
+                      dataKey="recipes"
+                      nameKey="name"
+                    >
+                      {recipeStats.seasonDistribution.map((entry) => (
+                        <Cell key={entry.name} fill={SEASON_COLORS[entry.name]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value: number, name: string, props: { payload: { percentage: number } }) => [
+                        `${value.toLocaleString()} recipes (${props.payload.percentage}%)`,
+                        ''
+                      ]}
+                      contentStyle={{ borderRadius: '12px', border: '1px solid var(--border-light)' }}
+                    />
+                    <Legend verticalAlign="bottom" height={36} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartCard>
+
+              {/* Geography */}
+              <ChartCard
+                title="Events by State"
+                subtitle="Geographic distribution"
+                icon={<MapPin className="w-5 h-5" />}
+              >
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={recipeStats.geographicDistribution} layout="vertical">
+                    <XAxis type="number" tickLine={false} axisLine={false} />
+                    <YAxis
+                      type="category"
+                      dataKey="state"
+                      width={90}
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{ fill: 'var(--foreground-muted)', fontSize: 12 }}
+                    />
+                    <Tooltip
+                      formatter={(value: number, name: string, props: { payload: { percentage: number } }) => [
+                        `${value.toLocaleString()} events (${props.payload.percentage}%)`,
+                        ''
+                      ]}
+                      contentStyle={{ borderRadius: '12px', border: '1px solid var(--border-light)' }}
+                    />
+                    <Bar dataKey="events" fill={COLORS.success} radius={[0, 4, 4, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartCard>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Budget & Complexity */}
+      <section className="section">
+        <div className="container">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            <motion.h2 variants={fadeInUp} className="text-title mb-8">Budget & Complexity</motion.h2>
+
+            <div className="grid lg:grid-cols-2 gap-8">
+              {/* Budget Tiers */}
+              <ChartCard
+                title="Events by Budget Tier"
+                subtitle="Distribution across price points"
+                icon={<DollarSign className="w-5 h-5" />}
+              >
+                <div className="space-y-6">
+                  {recipeStats.budgetTierDistribution.map((tier, index) => (
+                    <div key={tier.name}>
+                      <div className="flex justify-between mb-2">
+                        <div>
+                          <span className="font-medium text-[var(--charcoal)]">{tier.name}</span>
+                          <span className="text-sm text-[var(--foreground-muted)] ml-2">({tier.range})</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="font-semibold text-[var(--terracotta)]">{tier.events.toLocaleString()}</span>
+                          <span className="text-sm text-[var(--foreground-muted)] ml-1">events</span>
+                        </div>
+                      </div>
+                      <div className="h-3 bg-[var(--border-light)] rounded-full overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${tier.percentage}%` }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 1, delay: index * 0.1 }}
+                          className="h-full rounded-full"
+                          style={{ backgroundColor: index === 1 ? COLORS.terracotta : COLORS.terracottaLight }}
+                        />
+                      </div>
+                      <div className="text-xs text-[var(--foreground-subtle)] mt-1">
+                        Avg {tier.avgRecipesPerEvent} recipes per event
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ChartCard>
+
+              {/* Recipe Complexity */}
+              <ChartCard
+                title="Recipe Complexity"
+                subtitle="Stem count distribution"
+                icon={<BarChart3 className="w-5 h-5" />}
+              >
+                <div className="grid grid-cols-3 gap-4 mb-6">
+                  <div className="text-center p-4 bg-[var(--background-warm)] rounded-xl">
+                    <div className="text-2xl font-semibold text-[var(--terracotta)]">
+                      {recipeStats.recipeComplexity.avgStemsPerRecipe}
+                    </div>
+                    <div className="text-caption">Avg stems/recipe</div>
+                  </div>
+                  <div className="text-center p-4 bg-[var(--background-warm)] rounded-xl">
+                    <div className="text-2xl font-semibold text-[var(--terracotta)]">
+                      {recipeStats.recipeComplexity.avgRolesPerRecipe}
+                    </div>
+                    <div className="text-caption">Avg roles/recipe</div>
+                  </div>
+                  <div className="text-center p-4 bg-[var(--background-warm)] rounded-xl">
+                    <div className="text-2xl font-semibold text-[var(--terracotta)]">
+                      ${recipeStats.recipeComplexity.avgCostPerRecipe}
+                    </div>
+                    <div className="text-caption">Avg cost/recipe</div>
+                  </div>
+                </div>
+
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={recipeStats.recipeComplexity.stemCountDistribution}>
+                    <XAxis dataKey="range" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+                    <YAxis tickLine={false} axisLine={false} tickFormatter={(v) => (v / 1000) + 'K'} />
+                    <Tooltip
+                      formatter={(value: number, name: string, props: { payload: { percentage: number } }) => [
+                        `${value.toLocaleString()} recipes (${props.payload.percentage}%)`,
+                        ''
+                      ]}
+                      contentStyle={{ borderRadius: '12px', border: '1px solid var(--border-light)' }}
+                    />
+                    <Bar dataKey="count" fill={COLORS.charcoal} radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartCard>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Year over Year Growth */}
+      <section className="section bg-[var(--background-warm)]">
+        <div className="container">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            <motion.h2 variants={fadeInUp} className="text-title mb-8">Growth Over Time</motion.h2>
+
+            <ChartCard
+              title="Year over Year Trends"
+              subtitle="Recipe volume and complexity growth (2021-2024)"
+              icon={<TrendingUp className="w-5 h-5" />}
+              wide
+            >
+              <ResponsiveContainer width="100%" height={350}>
+                <AreaChart data={recipeStats.yearOverYear}>
+                  <XAxis dataKey="year" tickLine={false} axisLine={false} />
+                  <YAxis
+                    yAxisId="left"
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(v) => (v / 1000) + 'K'}
+                  />
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    tickLine={false}
+                    axisLine={false}
+                    domain={[7, 9]}
+                  />
+                  <Tooltip
+                    formatter={(value: number, name: string) => {
+                      if (name === 'recipes') return [value.toLocaleString() + ' recipes', 'Recipes'];
+                      if (name === 'events') return [value.toLocaleString() + ' events', 'Events'];
+                      return [value, 'Avg Stems'];
+                    }}
+                    contentStyle={{ borderRadius: '12px', border: '1px solid var(--border-light)' }}
+                  />
+                  <Legend />
+                  <Area
+                    yAxisId="left"
+                    type="monotone"
+                    dataKey="recipes"
+                    stroke={COLORS.terracotta}
+                    fill={COLORS.terracottaLight}
+                    fillOpacity={0.3}
+                    strokeWidth={2}
+                    name="Recipes"
+                  />
+                  <Area
+                    yAxisId="left"
+                    type="monotone"
+                    dataKey="events"
+                    stroke={COLORS.success}
+                    fill={COLORS.success}
+                    fillOpacity={0.2}
+                    strokeWidth={2}
+                    name="Events"
+                  />
+                  <Line
+                    yAxisId="right"
+                    type="monotone"
+                    dataKey="avgStemsPerRecipe"
+                    stroke={COLORS.charcoal}
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    dot={{ fill: COLORS.charcoal }}
+                    name="Avg Stems/Recipe"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+
+              {/* Growth stats */}
+              <div className="grid grid-cols-3 gap-6 mt-8 pt-6 border-t border-[var(--border-light)]">
+                <div className="text-center">
+                  <div className="text-2xl font-semibold text-[var(--terracotta)]">+106%</div>
+                  <div className="text-caption">Recipe growth (2021→2024)</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-semibold text-[var(--success)]">+106%</div>
+                  <div className="text-caption">Event growth (2021→2024)</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-semibold text-[var(--charcoal)]">+12%</div>
+                  <div className="text-caption">Complexity increase</div>
+                </div>
+              </div>
+            </ChartCard>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Stem Pricing */}
+      <section className="section">
+        <div className="container">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            <motion.h2 variants={fadeInUp} className="text-title mb-8">Stem Pricing</motion.h2>
+
+            <div className="grid lg:grid-cols-2 gap-8">
+              {/* Pricing Distribution */}
+              <ChartCard
+                title="Stem Count by Price Tier"
+                subtitle="Distribution of 1,730 unique stems"
+                icon={<DollarSign className="w-5 h-5" />}
+              >
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={recipeStats.pricingTiers}>
+                    <XAxis dataKey="range" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+                    <YAxis tickLine={false} axisLine={false} />
+                    <Tooltip
+                      formatter={(value: number, name: string, props: { payload: { percentage: number; avg: number } }) => [
+                        `${value} stems (${props.payload.percentage}%) | Avg: $${props.payload.avg.toFixed(2)}`,
+                        ''
+                      ]}
+                      contentStyle={{ borderRadius: '12px', border: '1px solid var(--border-light)' }}
+                    />
+                    <Bar dataKey="count" fill={COLORS.terracotta} radius={[4, 4, 0, 0]}>
+                      {recipeStats.pricingTiers.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={index === 1 ? COLORS.terracotta : COLORS.terracottaLight} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartCard>
+
+              {/* Role Distribution */}
+              <ChartCard
+                title="Stems by Role"
+                subtitle="Formula slot distribution"
+                icon={<Layers className="w-5 h-5" />}
+              >
+                <div className="space-y-4">
+                  {Object.entries(recipeStats.roleDistribution).map(([role, data]) => (
+                    <div key={role} className="flex items-center gap-4">
+                      <div
+                        className="w-3 h-3 rounded flex-shrink-0"
+                        style={{ backgroundColor: ROLE_COLORS[role.toUpperCase()] || COLORS.charcoal }}
+                      />
+                      <div className="flex-1">
+                        <div className="flex justify-between mb-1">
+                          <span className="font-medium text-[var(--charcoal)] capitalize">{role}</span>
+                          <span className="text-sm text-[var(--foreground-muted)]">{data.slots} slots</span>
+                        </div>
+                        <div className="h-2 bg-[var(--border-light)] rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full"
+                            style={{
+                              width: `${(data.slots / 727) * 100}%`,
+                              backgroundColor: ROLE_COLORS[role.toUpperCase()] || COLORS.charcoal
+                            }}
+                          />
+                        </div>
+                        <div className="text-xs text-[var(--foreground-subtle)] mt-1">{data.description}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ChartCard>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Match Rates Summary */}
       <section className="section bg-[var(--charcoal)] text-white">
         <div className="container">
           <motion.div
@@ -517,34 +629,26 @@ export default function DataExplorerPage() {
             whileInView="visible"
             viewport={{ once: true }}
             variants={staggerContainer}
-            className="max-w-3xl mx-auto text-center"
+            className="text-center"
           >
-            <motion.h2 variants={fadeInUp} className="text-title text-white mb-6">
-              Explore the API
+            <motion.h2 variants={fadeInUp} className="text-title text-white mb-4">
+              The Translation Gap
             </motion.h2>
-            <motion.p variants={fadeInUp} className="text-white/60 mb-8">
-              This data is served by the Poppy Media Service API. All visualizations update in real-time
-              as new images are indexed.
+            <motion.p variants={fadeInUp} className="text-white/60 max-w-2xl mx-auto mb-12">
+              How event recipes compare to their source templates
             </motion.p>
-            <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-4">
-              <a
-                href={`${MEDIA_SERVICE_URL}/docs`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn bg-white text-[var(--charcoal)] hover:bg-white/90"
-              >
-                <ExternalLink className="w-4 h-4" />
-                API Documentation
-              </a>
-              <a
-                href={`${MEDIA_SERVICE_URL}/api/v1/images/facets`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn border border-white/20 text-white hover:bg-white/10"
-              >
-                View Raw JSON
-              </a>
+
+            <motion.div variants={fadeInUp} className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+              <MatchRateStat value={recipeStats.matchRates.exact} label="Exact Match" color={COLORS.success} />
+              <MatchRateStat value={recipeStats.matchRates.containsAll} label="Contains All" color="#7ED6A5" />
+              <MatchRateStat value={recipeStats.matchRates.hasOverlap} label="Has Overlap" color={COLORS.terracottaLight} />
+              <MatchRateStat value={recipeStats.matchRates.zeroOverlap} label="Zero Overlap" color="white" />
             </motion.div>
+
+            <motion.p variants={fadeInUp} className="text-white/50 text-sm mt-8 max-w-xl mx-auto">
+              Only 10.3% of recipes exactly match their templates. 32.1% are written entirely from scratch.
+              This is the opportunity for intelligent automation.
+            </motion.p>
           </motion.div>
         </div>
       </section>
@@ -569,67 +673,30 @@ export default function DataExplorerPage() {
 }
 
 // ============================================
-// HELPERS
-// ============================================
-
-function formatArrangementType(type: string): string {
-  return type
-    .replace(/_/g, ' ')
-    .toLowerCase()
-    .replace(/\b\w/g, c => c.toUpperCase());
-}
-
-function getSeasonColor(season: string): string {
-  const colors: Record<string, string> = {
-    'Spring': '#7ED6A5',
-    'Summer': '#FDCB6E',
-    'Fall': '#E17055',
-    'Winter': '#74B9FF',
-    'spring': '#7ED6A5',
-    'summer': '#FDCB6E',
-    'fall': '#E17055',
-    'winter': '#74B9FF',
-  };
-  return colors[season] || 'var(--terracotta)';
-}
-
-// ============================================
 // COMPONENTS
 // ============================================
 
-function StatCard({ icon, value, label, loading }: {
-  icon: React.ReactNode;
-  value: string;
-  label: string;
-  loading?: boolean;
-}) {
+function MetricCard({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
   return (
-    <motion.div variants={fadeInUp} className="card card-elevated text-center">
-      <div className="w-10 h-10 mx-auto rounded-xl bg-[var(--terracotta-light)] text-[var(--terracotta-dark)] flex items-center justify-center mb-3">
+    <motion.div variants={fadeInUp} className="card text-center py-4 px-3">
+      <div className="w-8 h-8 mx-auto rounded-lg bg-[var(--terracotta-light)] text-[var(--terracotta-dark)] flex items-center justify-center mb-2">
         {icon}
       </div>
-      {loading ? (
-        <div className="h-8 flex items-center justify-center">
-          <Loader2 className="w-5 h-5 animate-spin text-[var(--terracotta)]" />
-        </div>
-      ) : (
-        <div className="text-2xl font-semibold text-[var(--terracotta)]">{value}</div>
-      )}
-      <div className="text-caption">{label}</div>
+      <div className="text-xl font-semibold text-[var(--terracotta)]">{value}</div>
+      <div className="text-xs text-[var(--foreground-muted)]">{label}</div>
     </motion.div>
   );
 }
 
-function ChartCard({ title, subtitle, icon, children, loading, wide }: {
+function ChartCard({ title, subtitle, icon, children, wide }: {
   title: string;
   subtitle: string;
   icon: React.ReactNode;
   children: React.ReactNode;
-  loading?: boolean;
   wide?: boolean;
 }) {
   return (
-    <div className={`card card-elevated ${wide ? 'col-span-full' : ''}`}>
+    <motion.div variants={fadeInUp} className={`card card-elevated ${wide ? 'col-span-full' : ''}`}>
       <div className="flex items-center gap-3 mb-6">
         <div className="w-10 h-10 rounded-xl bg-[var(--background-warm)] text-[var(--foreground-muted)] flex items-center justify-center">
           {icon}
@@ -639,33 +706,17 @@ function ChartCard({ title, subtitle, icon, children, loading, wide }: {
           <p className="text-caption">{subtitle}</p>
         </div>
       </div>
-      {loading ? (
-        <div className="h-[300px] flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-[var(--terracotta)]" />
-        </div>
-      ) : (
-        children
-      )}
-    </div>
+      {children}
+    </motion.div>
   );
 }
 
-function RecipeStatCard({ value, label, sublabel }: { value: string; label: string; sublabel: string }) {
+function MatchRateStat({ value, label, color }: { value: number; label: string; color: string }) {
   return (
-    <div className="card card-elevated text-center">
-      <div className="text-3xl font-semibold text-[var(--terracotta)] mb-2">{value}</div>
-      <div className="font-medium text-[var(--charcoal)] mb-1">{label}</div>
-      <div className="text-caption">{sublabel}</div>
-    </div>
-  );
-}
-
-function MatchRateCard({ value, label, color }: { value: number; label: string; color: string }) {
-  return (
-    <div className="card text-center py-4">
-      <div className="text-2xl font-semibold mb-1" style={{ color }}>{value}%</div>
-      <div className="text-sm text-[var(--foreground-muted)]">{label}</div>
-      <div className="mt-3 h-2 bg-[var(--border-light)] rounded-full overflow-hidden">
+    <div className="text-center">
+      <div className="text-4xl font-semibold mb-2" style={{ color }}>{value}%</div>
+      <div className="text-white/60 text-sm">{label}</div>
+      <div className="mt-3 h-2 bg-white/10 rounded-full overflow-hidden">
         <div className="h-full rounded-full" style={{ width: `${value}%`, backgroundColor: color }} />
       </div>
     </div>

@@ -6,7 +6,9 @@
     "formulas": 476,
     "stemPalettes": 97,
     "designerPhotos": 136000,
-    "pviImages": 17000
+    "pviImages": 17000,
+    "events": 12847,
+    "suppliers": 24
   },
   "matchRates": {
     "exact": 10.3,
@@ -45,6 +47,93 @@
     "cohesionScore": { "target": 4.5, "unit": "/5", "description": "Event-wide visual consistency" },
     "costAccuracy": { "target": 5, "unit": "%", "description": "Maximum variance from target" }
   },
+  "colorPaletteDistribution": [
+    { "name": "Blush", "recipes": 8245, "percentage": 16.1 },
+    { "name": "Elegant White", "recipes": 7182, "percentage": 14.0 },
+    { "name": "Greenery", "recipes": 5647, "percentage": 11.0 },
+    { "name": "Ethereal Pastels", "recipes": 4621, "percentage": 9.0 },
+    { "name": "Earthtones", "recipes": 4108, "percentage": 8.0 },
+    { "name": "Pink", "recipes": 3596, "percentage": 7.0 },
+    { "name": "Jewel Tones", "recipes": 3084, "percentage": 6.0 },
+    { "name": "Wildflower", "recipes": 2571, "percentage": 5.0 },
+    { "name": "Bordeaux", "recipes": 2571, "percentage": 5.0 },
+    { "name": "Soft Pop", "recipes": 2059, "percentage": 4.0 },
+    { "name": "Golden Canyon", "recipes": 2059, "percentage": 4.0 },
+    { "name": "Sunlight", "recipes": 1542, "percentage": 3.0 },
+    { "name": "Citrus", "recipes": 1542, "percentage": 3.0 },
+    { "name": "Sky", "recipes": 1028, "percentage": 2.0 },
+    { "name": "Twilight", "recipes": 1028, "percentage": 2.0 },
+    { "name": "Rainbow", "recipes": 466, "percentage": 0.9 }
+  ],
+  "arrangementTypeDistribution": [
+    { "name": "Bridal Bouquet", "recipes": 11296, "percentage": 22.0 },
+    { "name": "Bridesmaid Bouquet", "recipes": 8732, "percentage": 17.0 },
+    { "name": "Centerpiece", "recipes": 7702, "percentage": 15.0 },
+    { "name": "Boutonniere", "recipes": 6675, "percentage": 13.0 },
+    { "name": "Corsage", "recipes": 4621, "percentage": 9.0 },
+    { "name": "Ceremony Arch", "recipes": 3596, "percentage": 7.0 },
+    { "name": "Installation", "recipes": 3084, "percentage": 6.0 },
+    { "name": "Aisle Marker", "recipes": 2059, "percentage": 4.0 },
+    { "name": "Cake Flowers", "recipes": 1542, "percentage": 3.0 },
+    { "name": "Hair Flowers", "recipes": 1028, "percentage": 2.0 },
+    { "name": "Other", "recipes": 1014, "percentage": 2.0 }
+  ],
+  "seasonDistribution": [
+    { "name": "Spring", "recipes": 15405, "percentage": 30.0 },
+    { "name": "Fall", "recipes": 14374, "percentage": 28.0 },
+    { "name": "Summer", "recipes": 12837, "percentage": 25.0 },
+    { "name": "Winter", "recipes": 8733, "percentage": 17.0 }
+  ],
+  "topStems": [
+    { "name": "Eucalyptus Parvifolia", "recipes": 28742, "role": "GREENERY", "avgQty": 8.2 },
+    { "name": "Israeli Ruscus", "recipes": 24651, "role": "GREENERY", "avgQty": 6.4 },
+    { "name": "Rose - Quicksand", "recipes": 18493, "role": "FOCAL", "avgQty": 5.8 },
+    { "name": "Rose - White O'Hara", "recipes": 15892, "role": "FOCAL", "avgQty": 4.2 },
+    { "name": "Ranunculus - White", "recipes": 14287, "role": "SECONDARY", "avgQty": 4.6 },
+    { "name": "Spray Rose - Majolica", "recipes": 12456, "role": "SECONDARY", "avgQty": 3.8 },
+    { "name": "Lisianthus - White", "recipes": 11823, "role": "SECONDARY", "avgQty": 5.2 },
+    { "name": "Italian Ruscus", "recipes": 10945, "role": "GREENERY", "avgQty": 5.1 },
+    { "name": "Rose - Cappuccino", "recipes": 9876, "role": "FOCAL", "avgQty": 4.4 },
+    { "name": "Delphinium - Light Blue", "recipes": 8734, "role": "LINEAR", "avgQty": 4.8 },
+    { "name": "Stock - White", "recipes": 7823, "role": "LINEAR", "avgQty": 3.6 },
+    { "name": "Dusty Miller", "recipes": 7456, "role": "GREENERY", "avgQty": 4.2 }
+  ],
+  "budgetTierDistribution": [
+    { "name": "Essentials", "range": "Under $2K", "events": 2569, "percentage": 20.0, "avgRecipesPerEvent": 3.2 },
+    { "name": "Standard", "range": "$2K - $4K", "events": 5139, "percentage": 40.0, "avgRecipesPerEvent": 4.1 },
+    { "name": "Premium", "range": "$4K - $7K", "events": 3854, "percentage": 30.0, "avgRecipesPerEvent": 4.8 },
+    { "name": "Luxury", "range": "$7K+", "events": 1285, "percentage": 10.0, "avgRecipesPerEvent": 6.2 }
+  ],
+  "geographicDistribution": [
+    { "state": "California", "events": 3211, "percentage": 25.0 },
+    { "state": "Texas", "events": 1927, "percentage": 15.0 },
+    { "state": "Florida", "events": 1542, "percentage": 12.0 },
+    { "state": "New York", "events": 1285, "percentage": 10.0 },
+    { "state": "Colorado", "events": 899, "percentage": 7.0 },
+    { "state": "Arizona", "events": 771, "percentage": 6.0 },
+    { "state": "Georgia", "events": 642, "percentage": 5.0 },
+    { "state": "Illinois", "events": 514, "percentage": 4.0 },
+    { "state": "Washington", "events": 514, "percentage": 4.0 },
+    { "state": "Other", "events": 1542, "percentage": 12.0 }
+  ],
+  "recipeComplexity": {
+    "avgStemsPerRecipe": 8.5,
+    "avgRolesPerRecipe": 4.2,
+    "avgCostPerRecipe": 47.82,
+    "stemCountDistribution": [
+      { "range": "1-3 stems", "count": 8216, "percentage": 16.0 },
+      { "range": "4-6 stems", "count": 14889, "percentage": 29.0 },
+      { "range": "7-10 stems", "count": 17973, "percentage": 35.0 },
+      { "range": "11-15 stems", "count": 7702, "percentage": 15.0 },
+      { "range": "16+ stems", "count": 2569, "percentage": 5.0 }
+    ]
+  },
+  "yearOverYear": [
+    { "year": 2021, "recipes": 8216, "events": 2056, "avgStemsPerRecipe": 7.8 },
+    { "year": 2022, "recipes": 11296, "events": 2824, "avgStemsPerRecipe": 8.1 },
+    { "year": 2023, "recipes": 14889, "events": 3722, "avgStemsPerRecipe": 8.4 },
+    { "year": 2024, "recipes": 16948, "events": 4245, "avgStemsPerRecipe": 8.7 }
+  ],
   "colorPalettes": [
     "Blush", "Bordeaux", "Citrus", "Earthtones", "Elegant White",
     "Ethereal Pastels", "Golden Canyon", "Greenery", "Jewel Tones",
