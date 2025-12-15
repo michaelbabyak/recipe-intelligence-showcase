@@ -1,0 +1,90 @@
+{
+  "totals": {
+    "recipes": 51349,
+    "templates": 6538,
+    "stems": 1730,
+    "formulas": 476,
+    "stemPalettes": 97,
+    "designerPhotos": 136000,
+    "pviImages": 17000
+  },
+  "matchRates": {
+    "exact": 10.3,
+    "containsAll": 12.4,
+    "hasOverlap": 67.9,
+    "zeroOverlap": 32.1
+  },
+  "expansionRates": {
+    "boutonniere": { "template": 2.9, "event": 3.1, "change": 7 },
+    "corsage": { "template": 4.2, "event": 3.9, "change": -7 },
+    "bouquet": { "template": 6.0, "event": 8.2, "change": 37 },
+    "centerpiece": { "template": 6.3, "event": 8.7, "change": 38 },
+    "installation": { "template": 5.0, "event": 10.1, "change": 102 }
+  },
+  "roleDistribution": {
+    "focal": { "slots": 455, "avgQty": 5.2, "description": "Primary flowers that draw the eye" },
+    "secondary": { "slots": 727, "avgQty": 2.8, "description": "Supporting flowers that complement" },
+    "linear": { "slots": 431, "avgQty": 3.7, "description": "Stems that add height and movement" },
+    "greenery": { "slots": 697, "avgQty": 4.0, "description": "Foliage for texture and fill" },
+    "filler": { "slots": 520, "avgQty": 3.1, "description": "Small blooms for detail" },
+    "specialty": { "slots": 2, "avgQty": 1.0, "description": "Unique accent stems" }
+  },
+  "pricingTiers": [
+    { "range": "Under $1", "count": 372, "avg": 0.80, "percentage": 21.5 },
+    { "range": "$1-2", "count": 756, "avg": 1.31, "percentage": 43.7 },
+    { "range": "$2-5", "count": 483, "avg": 2.74, "percentage": 27.9 },
+    { "range": "$5-10", "count": 62, "avg": 6.41, "percentage": 3.6 },
+    { "range": "$10-20", "count": 24, "avg": 13.01, "percentage": 1.4 },
+    { "range": "$20+", "count": 33, "avg": 104.05, "percentage": 1.9 }
+  ],
+  "automationTargets": {
+    "automationRate": { "target": 80, "unit": "%", "description": "Recipes without rejection" },
+    "tweakRate": { "target": 15, "unit": "%", "description": "Approved with minor changes" },
+    "rejectionRate": { "target": 5, "unit": "%", "description": "Fully rejected" },
+    "timeSavings": { "target": 70, "unit": "%", "description": "Reduction in writing time" },
+    "cohesionScore": { "target": 4.5, "unit": "/5", "description": "Event-wide visual consistency" },
+    "costAccuracy": { "target": 5, "unit": "%", "description": "Maximum variance from target" }
+  },
+  "colorPalettes": [
+    "Blush", "Bordeaux", "Citrus", "Earthtones", "Elegant White",
+    "Ethereal Pastels", "Golden Canyon", "Greenery", "Jewel Tones",
+    "Pink", "Rainbow", "Sky", "Soft Pop", "Sunlight", "Twilight", "Wildflower"
+  ],
+  "workflowPhases": {
+    "current": [
+      { "name": "Catalog & Sales", "description": "Customer selects SKUs", "items": "~2,000 standard catalog items" },
+      { "name": "Merchandising", "description": "Custom variations created", "items": "~4,500 custom riffs" },
+      { "name": "Recipe Writing", "description": "Writers create production specs", "items": "~51,000 recipes" }
+    ],
+    "automation": [
+      { "phase": 1, "name": "Assemble Brief", "actor": "Claude", "description": "Gather all inputs into design brief" },
+      { "phase": 2, "name": "Analyze & Interpret", "actor": "Gemini", "description": "Understand style direction from photos and notes" },
+      { "phase": 3, "name": "Select Stems", "actor": "Gemini", "description": "Choose flowers with design rationale" },
+      { "phase": 4, "name": "Validate Constraints", "actor": "Claude", "description": "Check availability, cost, margins" },
+      { "phase": 5, "name": "Handle Substitutions", "actor": "Gemini", "description": "Recommend replacements for unavailable stems" },
+      { "phase": 6, "name": "Review Cohesion", "actor": "Gemini", "description": "Ensure event-wide visual consistency" },
+      { "phase": 7, "name": "Generate Recipes", "actor": "Claude", "description": "Create final database records" }
+    ],
+    "future": [
+      { "phase": 1, "name": "Catalog Bootstrap", "description": "Link photos with recipes, calculate pricing" },
+      { "phase": 2, "name": "Client Browse", "description": "Visual selection of real executed recipes" },
+      { "phase": 3, "name": "Customization", "description": "Nano Banana generates recipe-backed variants" },
+      { "phase": 4, "name": "Proposal Assembly", "description": "Aggregate stems, check availability, calculate margins" },
+      { "phase": 5, "name": "Execution & Growth", "description": "Execute orders, QA photos grow catalog" }
+    ]
+  },
+  "humanRoleTransformation": {
+    "recipeWriter": {
+      "current": { "title": "Recipe Writer", "focus": "80% creation, 20% review" },
+      "future": { "title": "Recipe Curator", "focus": "80% curation, 20% edge cases" }
+    },
+    "designer": {
+      "current": { "title": "Designer", "focus": "Execution + interpretation" },
+      "future": { "title": "Designer", "focus": "Pure execution with reference images" }
+    },
+    "sales": {
+      "current": { "title": "Sales", "focus": "Promise management" },
+      "future": { "title": "Sales", "focus": "Visual selection + customization guide" }
+    }
+  }
+}
