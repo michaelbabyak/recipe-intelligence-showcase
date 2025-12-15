@@ -324,7 +324,7 @@ export default function CurrentStatePage() {
                 <Tooltip
                   formatter={(value: number, name: string) => [
                     `${value} stems`,
-                    name === 'template' ? 'Template' : 'Event Recipe'
+                    name === 'Template' ? 'Template' : 'Event Recipe'
                   ]}
                   contentStyle={{
                     borderRadius: '12px',
