@@ -492,7 +492,7 @@ export default function AutomationPage() {
               <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
                 <div className="flex items-center gap-3 mb-4">
                   <Sparkles className="w-5 h-5 text-[var(--terracotta-light)]" />
-                  <h4 className="font-semibold">Gemini Context Improvement</h4>
+                  <h4 className="font-semibold text-white">Gemini Context Improvement</h4>
                 </div>
                 <p className="text-white/60 text-sm">
                   &ldquo;When customer says &lsquo;organic&rsquo;, they usually want 40%+ greenery&rdquo;
@@ -501,7 +501,7 @@ export default function AutomationPage() {
               <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
                 <div className="flex items-center gap-3 mb-4">
                   <Brain className="w-5 h-5 text-[#8B5CF6]" />
-                  <h4 className="font-semibold">Claude Rules Refinement</h4>
+                  <h4 className="font-semibold text-white">Claude Rules Refinement</h4>
                 </div>
                 <p className="text-white/60 text-sm">
                   &ldquo;Ranunculus in June requires supplier confirmation before proceeding&rdquo;
